@@ -1,0 +1,30 @@
+name: RTL CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes iverilog
+          iverilog -V
+          vvp -V
+
+      - name: Compile top-level RTL
+        run: make lint
+
+      - name: Run self-checking testbenches
+        run: make test
